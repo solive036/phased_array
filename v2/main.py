@@ -55,5 +55,6 @@ data = SDR.rx_data(sdr)
 
 #plot
 dp.psd(data)
-PHASER.set_phase(phaser)
-PHASER.print_channel_phase(phaser)
+aoas, powers = PHASER.DOA(phaser, signal_freq)
+dp.polar(aoas, powers)
+#PHASER.print_channel_phase(phaser)
