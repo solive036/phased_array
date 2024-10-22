@@ -51,10 +51,10 @@ offset = 1000000
 phaser.lo = int(signal_freq +sdr.rx_lo - offset)
 
 #receive samples
-data = SDR.rx_data(sdr)
+#data = SDR.rx_data(sdr)
+aoas, powers = PHASER.DOA(phaser, signal_freq) #compute the DOA
 
 #plot
-dp.psd(data)
-aoas, powers = PHASER.DOA(phaser, signal_freq)
+#dp.psd(data)
 dp.polar(aoas, powers)
-#PHASER.print_channel_phase(phaser)
+dp.compute_max_angle(aoas, powers)
