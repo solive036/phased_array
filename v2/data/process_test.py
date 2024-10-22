@@ -12,7 +12,14 @@ def polar(angles_of_arrival, powers):
     ax.grid(True)
     plt.show()
 
+def get_angle_max(aoas, powers):
+    aoas = np.rad2deg(aoas)
+    max_power_index = np.argmax(powers)  # Get the index of the maximum power
+    angle_of_max = aoas[max_power_index]  # Retrieve the corresponding angle
+    print('Angle of max power: ', angle_of_max)
+
 aoas = np.load('aoas.npy')
 powers = np.load('powers.npy')
+get_angle_max(aoas, powers)
 
 polar(aoas, powers)
