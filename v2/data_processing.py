@@ -16,7 +16,7 @@ def psd(data):
     plt.show()
 
 #plots power against AOA in polar plot
-def polar(angles_of_arrival, powers):
+def polar_plot(angles_of_arrival, powers):
     fig, ax = plt.subplots(subplot_kw={'projection' : 'polar'})
     ax.plot(np.deg2rad(angles_of_arrival), powers)
     ax.set_rticks([-40, -30, -20, -10, 0])  
@@ -29,19 +29,22 @@ def polar(angles_of_arrival, powers):
 
 """
 process data
-"""
-def compute_max_angle(angles_of_arrival, powers):
-    angles_of_arrival = np.array(angles_of_arrival)
-    powers = np.array(powers)
-    np.save('aoas.npy', angles_of_arrival)
-    np.save('powers.npy', powers)
-    min_value = np.min(powers)
-    print('min value: ', min_value)
-    index = np.where((angles_of_arrival == min_value))
-    print('Index: ', index[0])
-    #print('index: ', np.where((angles_of_arrival == min_value)[0]) 
-    #print('Max. power value: ', np.min(powers))
-    
+""" 
+#returns where the peak power occurs, in degrees
+def get_peak_power_angle(aoas, powers):
+    max_power_index = np.argmax(powers) 
+    angle_max_power = aoas[max_power_index] 
+    print('Angle of max power: ', angle_max_power)
+    return angle_max_power
+
+#returns the angle where received samples have minimum power, in degrees
+def get_min_power_angle(aoas, powers):
+    min_power_index = np.argmin(powers)
+    angle_min_power = aoas[min_power_index]
+    print('Angle of min power: ', angle_min_power)
+    return angle_min_power
+
+
     
 
     

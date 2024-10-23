@@ -1,10 +1,15 @@
 import matplotlib.pyplot as plt
 import adi
+import numpy as np
+import sys
 import sdr_functions as SDR
 import phaser_functions as PHASER
 import pickle
 import data_processing as dp
 
+"""
+HARDWARE SETUP
+"""
 #initialize hardware
 sdr_ip = "ip:192.168.2.1"
 phaser_ip = "ip:phaser.local"
@@ -50,11 +55,49 @@ sdr.rx_hardwaregain_chan1 = int(30)  # must be between -3 and 70
 offset = 1000000
 phaser.lo = int(signal_freq +sdr.rx_lo - offset)
 
-#receive samples
-#data = SDR.rx_data(sdr)
-aoas, powers = PHASER.DOA(phaser, signal_freq) #compute the DOA
+"""
+Use the Phaser 
+"""
+angles_of_arrival = []
+powers = []
 
-#plot
-#dp.psd(data)
-dp.polar(aoas, powers)
-dp.compute_max_angle(aoas, powers)
+#Initialize the plot
+fig, ax = plt.subplots(subplot_kw={'projection' : 'polar'})
+line, = ax.plot([], [], lw=2)
+min_point, = ax.plot([], [], 'o')
+max_point, = ax.plot([], [], 'o')
+ax.set_rticks([-40, -30, -20, -10, 0])  
+ax.set_theta_direction(-1) 
+ax.set_theta_zero_location('N') 
+ax.grid(True)
+
+#real time plot
+try: 
+    while True:
+        angles_of_arrival, powers = PHASER.DOA(phaser, signal_freq)
+        
+        #get AOA of min and max power
+        angle_min_power = dp.get_min_power_angle(angles_of_arrival, powers)
+        angle_max_power = dp.get_peak_power_angle(angles_of_arrival, powers)
+
+        #update the line
+        line.set_data(np.deg2rad(angles_of_arrival), powers)
+
+
+        #plot points of minimum and maximum power
+        min_point.set_data(np.deg2rad(angle_min_power), np.min(powers))
+        max_point.set_data(np.deg2rad(angle_max_power), 0)
+
+        ax.set_thetamin(np.min(angles_of_arrival)) 
+        ax.set_thetamax(np.max(angles_of_arrival))
+        
+        ax.relim()
+        ax.autoscale_view()
+
+        plt.draw()
+        plt.pause(0.001)
+
+
+except KeyboardInterrupt:
+    print('Exiting...')
+    sys.exit()

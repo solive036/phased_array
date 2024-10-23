@@ -20,3 +20,15 @@ def DOA(phaser, signal_freq):
 
     powers -= np.max(powers)
     return aoas, powers
+
+def steer_beam(phaser, signal_freq, steer_angle):
+    for i in range(8):
+        d = phaser.element_spacing * i
+        phi = (2.0*np.pi*signal_freq*d) * (np.sin(np.radians(steer_angle)))
+        channel_phase = phi % 360
+        phaser.elements.get(i+1).rx_phase = channel_phase
+    phaser.latch_rx_settings()
+
+
+
+        
