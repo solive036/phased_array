@@ -21,13 +21,23 @@ def DOA(phaser, signal_freq):
     powers -= np.max(powers)
     return aoas, powers
 
-def steer_beam(phaser, signal_freq, steer_angle):
-    for i in range(8):
-        d = phaser.element_spacing * i
-        phi = (2.0*np.pi*signal_freq*d) * (np.sin(np.radians(steer_angle)))
-        channel_phase = phi % 360
-        phaser.elements.get(i+1).rx_phase = channel_phase
-    phaser.latch_rx_settings()
+def steer_beam(phaser, signal_freq, steer_angles):
+    powers = []
+    aoas = []
+    for angle in steer_angles:
+        for i in range(8):
+            d = phaser.element_spacing * i
+            phi = (2.0*np.pi*signal_freq*d) * (np.sin(np.radians(angle)))
+            channel_phase = phi % 360
+            phaser.elements.get(i+1).rx_phase = channel_phase
+        phaser.latch_rx_settings()
+        data = phaser.sdr.rx()
+        data_sum = data[0] + data[1]
+        power_db = 10*np.log10(np.sum(np.abs(data_sum) **2))
+        aoas = [steer_angle] * 8
+        powers.append(power_db)
+        print(aoas)
+    
 
 
 
