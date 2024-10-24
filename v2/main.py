@@ -53,7 +53,7 @@ sdr.rx_hardwaregain_chan0 = int(30)  # must be between -3 and 70
 sdr.rx_hardwaregain_chan1 = int(30)  # must be between -3 and 70
 
 offset = 1000000
-phaser.lo = int(signal_freq +sdr.rx_lo - offset)
+phaser.lo = int(signal_freq + sdr.rx_lo - offset)
 
 """
 Use the Phaser 
