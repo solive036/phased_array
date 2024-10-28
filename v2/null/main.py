@@ -8,6 +8,11 @@ import pickle
 import data_processing as dp
 
 """
+Functions
+"""
+
+
+"""
 HARDWARE SETUP
 """
 #initialize hardware
@@ -81,3 +86,12 @@ iq = 1 * (i + 1j * q)
 sdr._ctx.set_timeout(0)
 sdr.tx([iq * 0.5, iq]) #2nd channel transmits
 
+try:
+    while True:
+        #data = phaser.rx()
+        #data = data[0] + data[1]
+        aoas, powers = PHASER.DOA(phaser, signal_freq)
+        dp.polar_plot(aoas, powers)
+except KeyboardInterrupt:
+    sdr.tx_destroy_buffer()
+    sys.exit()
