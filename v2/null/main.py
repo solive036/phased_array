@@ -22,7 +22,7 @@ sdr = adi.ad9361(uri=sdr_ip)
 phaser = adi.CN0566(uri=phaser_ip, sdr=sdr)
 
 #get signal frequency of HB100
-signal_freq = pickle.load(open("hb100_freq_val.pkl", "rb"))
+#signal_freq = pickle.load(open("hb100_freq_val.pkl", "rb"))
 
 phaser.configure(device_mode="rx")
 
@@ -86,12 +86,46 @@ iq = 1 * (i + 1j * q)
 sdr._ctx.set_timeout(0)
 sdr.tx([iq * 0.5, iq]) #2nd channel transmits
 
-try:
+"""
+angles_of_arrival = []
+powers = []
+
+#Initialize the plot
+fig, ax = plt.subplots(subplot_kw={'projection' : 'polar'})
+line, = ax.plot([], [], lw=2)
+min_point, = ax.plot([], [], 'o')
+max_point, = ax.plot([], [], 'o')
+ax.set_rticks([-40, -30, -20, -10, 0])  
+ax.set_theta_direction(-1) 
+ax.set_theta_zero_location('N') 
+ax.grid(True)
+
+try: 
     while True:
-        #data = phaser.rx()
-        #data = data[0] + data[1]
-        aoas, powers = PHASER.DOA(phaser, signal_freq)
-        dp.polar_plot(aoas, powers)
+        angles_of_arrival, powers = PHASER.DOA(phaser, signal_freq)
+        
+        #get AOA of min and max power
+        angle_min_power = dp.get_min_power_angle(angles_of_arrival, powers)
+        angle_max_power = dp.get_peak_power_angle(angles_of_arrival, powers)
+
+        #update the line
+        line.set_data(np.deg2rad(angles_of_arrival), powers)
+
+
+        #plot points of minimum and maximum power
+        min_point.set_data(np.deg2rad(angle_min_power), np.min(powers))
+        max_point.set_data(np.deg2rad(angle_max_power), 0)
+
+        ax.set_thetamin(np.min(angles_of_arrival)) 
+        ax.set_thetamax(np.max(angles_of_arrival))
+        
+        ax.relim()
+        ax.autoscale_view()
+
+        plt.draw()
+        plt.pause(0.001)
 except KeyboardInterrupt:
     sdr.tx_destroy_buffer()
     sys.exit()
+
+"""
