@@ -67,6 +67,11 @@ def get_min_power_angle(aoas, powers):
     print('Angle of min power: ', angle_min_power)
     return angle_min_power
 
+def compute_psd(data):
+    psd0 = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(data[0])))**2)
+    psd1 = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(data[1])))**2)
+    psd = [psd0, psd1]
+    return psd
 
     
 

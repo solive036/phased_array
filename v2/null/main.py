@@ -8,18 +8,18 @@ import pickle
 import data_processing as dp
 
 """
-Functions
-"""
-
-
-"""
 HARDWARE SETUP
 """
-#initialize hardware
-sdr_ip = "ip:192.168.2.1"
-phaser_ip = "ip:phaser.local"
-sdr = adi.ad9361(uri=sdr_ip)
-phaser = adi.CN0566(uri=phaser_ip, sdr=sdr)
+try:
+    #initialize hardware
+    sdr_ip = "ip:192.168.2.1"
+    phaser_ip = "ip:phaser.local"
+    sdr = adi.ad9361(uri=sdr_ip)
+    phaser = adi.CN0566(uri=phaser_ip, sdr=sdr)
+    print('Phaser and Pluto Connected')
+except:
+    print('Error connecting phaser and sdr')
+    exit()
 
 #get signal frequency of HB100
 #signal_freq = pickle.load(open("hb100_freq_val.pkl", "rb"))
@@ -37,9 +37,9 @@ for i in range(0, len(gain_list)):
 
 # Setup Raspberry Pi GPIO states
 try:
-    phaser._gpios.gpio_tx_sw = 0  # 0 = TX_OUT_2, 1 = TX_OUT_1
-    phaser._gpios.gpio_vctrl_1 = 1 # 1=Use onboard PLL/LO source  (0=disable PLL and VCO, and set switch to use external LO input)
-    phaser._gpios.gpio_vctrl_2 = 1 # 1=Send LO to transmit circuitry  (0=disable Tx path, and send LO to LO_OUT)
+    phaser._gpios.gpio_tx_sw = 0 
+    phaser._gpios.gpio_vctrl_1 = 1 # 1=Use onboard PLL/LO source
+    phaser._gpios.gpio_vctrl_2 = 1 # 1=Send LO to transmit circuitry
 except:
     phaser.gpios.gpio_tx_sw = 0  # 0 = TX_OUT_2, 1 = TX_OUT_1
     phaser.gpios.gpio_vctrl_1 = 1 # 1=Use onboard PLL/LO source  (0=disable PLL and VCO, and set switch to use external LO input)
@@ -82,9 +82,22 @@ i = np.cos(2 * np.pi * t * fc) * 2 ** 14
 q = np.sin(2 * np.pi * t * fc) * 2 ** 14
 iq = 1 * (i + 1j * q)
 
+
 #transmit data
-sdr._ctx.set_timeout(0)
-sdr.tx([iq * 0.5, iq]) #2nd channel transmits
+#sdr._ctx.set_timeout(0)
+results = []
+try:
+    sdr.tx([iq * 0.5, iq]) #2nd channel transmits
+    for i in range(0, 20):
+        data = phaser.sdr.rx()
+        #sum = data[0] + data[1]
+        psd = dp.compute_psd(data)
+        results.append(psd)
+    np.save('psd.npy', results)
+except KeyboardInterrupt:
+    sdr.tx_destroy_buffer()
+    print('Exiting')
+    
 
 """
 angles_of_arrival = []
