@@ -1,0 +1,7 @@
+#plan for 'null steering'
+
+Ideas:
+    I) detect which direction signal is coming from, which
+        direction the jamming signal is coming from
+    II) steer the array to 'null' the jamming signal
+    
