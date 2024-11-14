@@ -49,7 +49,7 @@ except:
 sample_rate = 0.6e6
 center_freq = 2.1e9
 signal_freq = 100e3
-fft_size = 1024 * 64
+fft_size = 1024 * 4
 
 sdr.sample_rate = int(sample_rate)
 sdr.rx_lo = int(center_freq)
@@ -66,11 +66,34 @@ sdr.tx_cyclic_buffer = True
 sdr.tx_hardwaregain_chan0 = -88 #attenuated
 sdr.tx_hardwaregain_chan1 = -0
 
-#configure ramping PLL (ADF4159)
-output_freq = 12.2e9
-phaser.frequency = int(output_freq/4)
-phaser.ramp_mode = 'disabled'
-phaser.enable = 0
+# Configure the ADF4159 Rampling PLL
+output_freq = 12.145e9
+BW = 500e6
+num_steps = 500
+ramp_time = 0.5e3  # us
+phaser.frequency = int(output_freq / 4)  # Output frequency divided by 4
+phaser.freq_dev_range = int(
+    BW / 4
+)  # frequency deviation range in Hz.  This is the total freq deviation of the complete freq ramp
+phaser.freq_dev_step = int(
+    (BW/4) / num_steps
+)  # frequency deviation step in Hz.  This is fDEV, in Hz.  Can be positive or negative
+phaser.freq_dev_time = int(
+    ramp_time
+)  # total time (in us) of the complete frequency ramp
+print("requested freq dev time = ", ramp_time)
+ramp_time = phaser.freq_dev_time
+ramp_time_s = ramp_time / 1e6
+print("actual freq dev time = ", ramp_time)
+phaser.delay_word = 4095  # 12 bit delay word.  4095*PFD = 40.95 us.  For sawtooth ramps, this is also the length of the Ramp_complete signal
+phaser.delay_clk = "PFD"  # can be 'PFD' or 'PFD*CLK1'
+phaser.delay_start_en = 0  # delay start
+phaser.ramp_delay_en = 0  # delay between ramps.
+phaser.trig_delay_en = 0  # triangle delay
+phaser.ramp_mode = "continuous_sawtooth"  # ramp_mode can be:  "disabled", "continuous_sawtooth", "continuous_triangular", "single_sawtooth_burst", "single_ramp_burst"
+
+phaser.tx_trig_en = 0  # start a ramp with TXdata
+phaser.enable = 0  # 0 = PLL enable.  Write this last to update all the registers
 
 # Create a sinewave waveform
 fs = int(sdr.sample_rate)
@@ -98,13 +121,12 @@ try:
     data = phaser.sdr.rx()
     #dp.psd(data)
     data = data[0] + data[1]
-    data_norm = dp.normalize(data)
-    iq_norm = dp.normalize(iq)
-    plt.plot(t[0:200], data_norm[0:200])
-    plt.plot(t[0:200], iq_norm[0:200])
+    #data_norm = dp.normalize(data)
+    #iq_norm = dp.normalize(iq)
+    #plt.plot(t[0:200], data_norm[0:200])
+    #plt.plot(t[0:200], iq_norm[0:200])
+    plt.plot(np.real(data[0:200]))
     plt.show()
-    np.save('rx_data.npy', data_norm)
-    np.save('tx_data.npy', iq_norm)
     #plt.show()
     
 except KeyboardInterrupt:
