@@ -67,11 +67,10 @@ def get_min_power_angle(aoas, powers):
     print('Angle of min power: ', angle_min_power)
     return angle_min_power
 
-def compute_psd(data):
-    psd0 = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(data[0])))**2)
-    psd1 = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(data[1])))**2)
-    psd = [psd0, psd1]
-    return psd
+def compute_psd(data, phaser):
+    psd = 20*np.log10(np.abs(np.fft.fftshift(np.fft.fft(data)))**2)
+    freq = np.fft.fftfreq(data.size, phaser.sdr.sample_rate/data.size)
+    return psd, freq
 
 def normalize(data):
     data = np.array(np.real(data))
@@ -79,10 +78,10 @@ def normalize(data):
     return data_normalized
 
 def get_freq_max_power(psd, freq_axis):
-    max_index = np.max(psd)
-    max_freq = freq_axis[max_index]
-    return max_freq
-    
+    max_value = np.max(psd)
+    index, = np.where(psd == max_value)
+    frequency_of_occurance = freq_axis[index]
+    return frequency_of_occurance
 
 def compute_beat_freq(freq_max_power, f0):
     return np.abs(freq_max_power - f0)

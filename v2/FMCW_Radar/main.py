@@ -89,6 +89,9 @@ sampling_period = 1/sdr.sample_rate
 print('Sampling period: ', sampling_period)
 t = sampling_period*np.arange(fft_size)
 
+#initalize plot
+fig, ax = plt.subplots()
+
 #transmit data
 sdr._ctx.set_timeout(0)
 results = []
@@ -98,10 +101,25 @@ try:
     while True:
         data = phaser.sdr.rx()
         data = data[0] + data[1]
-        psd, freq = dp.psd(data)
-        freq_max_power = dp.max_power_freq(psd, freq)
-        beat_freq = dp.compute_beat_freq(freq_max_power, signal_freq)
-        print(dp.compute_velocity(beat_freq, signal_freq))
+        psd, freq = dp.compute_psd(data, phaser)
+        #plt.plot(freq, psd)
+        #plt.show()
+        f_d = dp.get_freq_max_power(psd, freq)
+        beat_freq = dp.compute_beat_freq(f_d, signal_freq)
+        beat_freq = beat_freq - 100000
+        print(beat_freq)
+
+        #plotting
+        ax.axhline(y=0, color='b', linestyle='-')
+        ax.axhline(beat_freq, color='r', linestyle='-')
+
+        ax.relim()
+        ax.autoscale_view()        
+
+        plt.draw()
+        plt.pause(0.001)
+        
+        
         
 
     """
