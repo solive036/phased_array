@@ -68,19 +68,21 @@ def get_min_power_angle(aoas, powers):
     return angle_min_power
 
 def compute_psd(data):
-    psd0 = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(data[0])))**2)
-    psd1 = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(data[1])))**2)
-    psd = [psd0, psd1]
-    return psd
+    psd = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(data[0])))**2)
+    freq_axis = np.linspace(-30e6/2, 30e6/2, len(data[0]))
+    return [psd, freq_axis]
+
+def get_freq_max_power(psd, freq):
+    #get the frequency at which the maximum power occurs
+    return 0
 
 def normalize(data):
     data = np.array(np.real(data))
     data_normalized = 2*((data-np.min(data))/(np.max(data)-np.min(data)))-1 #normalize data to between -1 and 1
     return data_normalized
 
-def compute_beat_freq(psd):
-    #compute
-    return 0
+def compute_beat_freq(freq_max_power, f0):
+    return np.abs(freq_max_power - f0)
 
 def compute_velocity(f_beat, f0):
     c = 3e8

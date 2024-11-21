@@ -95,6 +95,16 @@ results = []
 try:
     sdr.tx([iq * 0.5, iq]) #2nd channel transmits
 
+    while True:
+        data = phaser.sdr.rx()
+        data = data[0] + data[1]
+        psd, freq = dp.psd(data)
+        freq_max_power = dp.max_power_freq(psd, freq)
+        beat_freq = dp.compute_beat_freq(freq_max_power, signal_freq)
+        print(dp.compute_velocity(beat_freq, signal_freq))
+        
+
+    """
     data = phaser.sdr.rx()
     #dp.psd(data)
     data = data[0] + data[1]
@@ -106,6 +116,9 @@ try:
     np.save('rx_data.npy', data_norm)
     np.save('tx_data.npy', iq_norm)
     #plt.show()
+    """
+
+
     
 except KeyboardInterrupt:
     sdr.tx_destroy_buffer()
