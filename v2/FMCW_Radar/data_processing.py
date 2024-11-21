@@ -78,6 +78,20 @@ def normalize(data):
     data_normalized = 2*((data-np.min(data))/(np.max(data)-np.min(data)))-1 #normalize data to between -1 and 1
     return data_normalized
 
+def get_freq_max_power(psd, freq_axis):
+    max_index = np.max(psd)
+    max_freq = freq_axis[max_index]
+    return max_freq
+    
+
+def compute_beat_freq(freq_max_power, f0):
+    return np.abs(freq_max_power - f0)
+
+def compute_velocity(f_beat, f0):
+    c = 3e8
+    v_target = (f_beat * c)/(2*f0)
+    return v_target
+    
 
     
     
