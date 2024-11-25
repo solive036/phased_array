@@ -1,4 +1,7 @@
 import matplotlib.pyplot as plt
+import matplotlib.animation as an
+from matplotlib import style
+from matplotlib.animation import FuncAnimation
 import adi
 import numpy as np
 import sys
@@ -6,6 +9,7 @@ import sdr_functions as SDR
 import phaser_functions as PHASER
 import pickle
 import data_processing as dp
+
 
 """
 HARDWARE SETUP
@@ -91,10 +95,14 @@ t = sampling_period*np.arange(fft_size)
 
 #initalize plot
 fig, ax = plt.subplots()
+line, = ax.plot([],[])
+ax.set_xlim([0, 10])
+plt.ion()
 
 #transmit data
 sdr._ctx.set_timeout(0)
-results = []
+beat_freq_prev = 0
+
 try:
     sdr.tx([iq * 0.5, iq]) #2nd channel transmits
 
@@ -102,22 +110,27 @@ try:
         data = phaser.sdr.rx()
         data = data[0] + data[1]
         psd, freq = dp.compute_psd(data, phaser)
-        #plt.plot(freq, psd)
-        #plt.show()
         f_d = dp.get_freq_max_power(psd, freq)
         beat_freq = dp.compute_beat_freq(f_d, signal_freq)
-        beat_freq = beat_freq - 100000
-        print(beat_freq)
+        beat_freq = (beat_freq - signal_freq)
 
+        beat_freq_difference = (beat_freq - beat_freq_prev) * 1000000
+        print(beat_freq_difference)
+
+        """
         #plotting
-        ax.axhline(y=0, color='b', linestyle='-')
-        ax.axhline(beat_freq, color='r', linestyle='-')
-
-        ax.relim()
-        ax.autoscale_view()        
-
-        plt.draw()
+        plt.axhline(y=0)
+        plt.axhline(beat_freq_difference)
+        
+        fig.canvas.draw()
+        fig.canvas.flush_events
         plt.pause(0.001)
+
+        plt.show()
+        """
+        
+        #print(beat_freq_difference)
+        beat_freq_prev = beat_freq 
         
         
         
