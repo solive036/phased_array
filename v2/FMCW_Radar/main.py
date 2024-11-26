@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
-import matplotlib.animation as an
-from matplotlib import style
+import matplotlib.animation as animation
 from matplotlib.animation import FuncAnimation
+from matplotlib import style
 import adi
 import numpy as np
 import sys
@@ -10,6 +10,20 @@ import phaser_functions as PHASER
 import pickle
 import data_processing as dp
 
+fig, ax = plt.subplots()
+ax.set_xlim(0, 10)
+ax.set_ylim(-10, 10)
+
+
+def init_plot():
+    line.set_data([], [])
+    return line,
+
+def update(frame, y_value):
+    x = np.linspace(0, 10, 10)
+    y = [y_value] * len(x)
+    line.set_data(x, y)
+    return line,
 
 """
 HARDWARE SETUP
@@ -115,7 +129,7 @@ try:
         beat_freq = (beat_freq - signal_freq)
 
         beat_freq_difference = (beat_freq - beat_freq_prev) * 1000000
-        print(beat_freq_difference)
+        #print(beat_freq_difference)
 
         """
         #plotting
@@ -128,7 +142,8 @@ try:
 
         plt.show()
         """
-        
+        ani = FuncAnimation(fig, update, init_func=init_plot, fargs=(beat_freq_difference,),blit=True, interval=200)
+        plt.show()
         
         #print(beat_freq_difference)
         beat_freq_prev = beat_freq 
