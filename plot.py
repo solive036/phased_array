@@ -23,6 +23,6 @@ def update(frame):
     line.set_data(x, y_values)
     return line,
 
-ani = FuncAnimation(fig, update, frames=range(100), init_func=init, blit=True, interval=200)
+ani = FuncAnimation(fig, update, init_func=init, blit=True, interval=200)
 
 plt.show()
