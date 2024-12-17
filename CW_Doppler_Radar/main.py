@@ -7,6 +7,8 @@ import adi
 import sys
 
 spectrogram_width = 75
+file_name = 'data.npy'
+fopen = ('data.npy', 'ab')
 
 #Initialize SDR and Phaser
 try:
@@ -105,6 +107,8 @@ class SDRWorker(QObject):
         self.spectrogram[:, 0] = psd
         self.spectrogram_update.emit(self.spectrogram)
         self.end_of_run.emit()
+        #save samples to file
+        
 
 class MainWindow(QMainWindow):
     def __init__(self):
