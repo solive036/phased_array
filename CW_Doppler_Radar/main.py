@@ -6,8 +6,7 @@ import data_processing as dp
 import adi
 import sys
 
-buffer_size = 1024
-spectrogram_width = 200
+spectrogram_width = 75
 
 #Initialize SDR and Phaser
 try:
@@ -54,8 +53,8 @@ sdr.rx_enabled_channels = [0, 1]
 sdr.rx_buffer_size = int(fft_size)
 sdr.gain_control_mode_chan0 = 'manual'
 sdr.gain_control_mode_chan1 = 'manual'
-sdr.rx_hardwaregain_chan0 = int(30)
-sdr.rx_hardwaregain_chan1 = int(30)
+sdr.rx_hardwaregain_chan0 = int(60)
+sdr.rx_hardwaregain_chan1 = int(60)
 
 sdr.tx_lo = int(center_freq)
 sdr.tx_enabled_channels = [0, 1]
@@ -96,12 +95,12 @@ class SDRWorker(QObject):
 
     def __init__(self):
         super().__init__()
-        self.spectrogram = np.zeros((buffer_size, spectrogram_width))
+        self.spectrogram = np.zeros((fft_size, spectrogram_width))
 
     def run(self):
         samples = phaser.sdr.rx()
         samples = samples[0] + samples[1]
-        psd, freq_axis = dp.compute_psd(samples, phaser)
+        psd = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(samples)))**2)
         self.spectrogram = np.roll(self.spectrogram, 1, axis=1)
         self.spectrogram[:, 0] = psd
         self.spectrogram_update.emit(self.spectrogram)
@@ -140,7 +139,7 @@ class MainWindow(QMainWindow):
         self.sdr_thread.start()
 
     def spectrogram_callback(self, spectrogram_data):
-        self.imageitem.setImage(spectrogram_data, autoLevels=False)
+        self.imageitem.setImage(spectrogram_data, autoLevels=True)
         sigma = np.std(spectrogram_data)
         mean = np.mean(spectrogram_data)
         self.spectrogram_min = mean - 2 * sigma
