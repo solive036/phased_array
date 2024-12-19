@@ -33,7 +33,6 @@ def steer_beam(phaser, signal_freq, steer_angle):
     data_sum = data[0] + data[1]
     power_db = 10*np.log10(np.sum(np.abs(data_sum) **2))
     powers.append(power_db)
-    print(powers[0:40])
 
 
 

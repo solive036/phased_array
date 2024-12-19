@@ -34,14 +34,12 @@ process data
 def get_peak_power_angle(aoas, powers):
     max_power_index = np.argmax(powers) 
     angle_max_power = aoas[max_power_index] 
-    print('Angle of max power: ', angle_max_power)
     return angle_max_power
 
 #returns the angle where received samples have minimum power, in degrees
 def get_min_power_angle(aoas, powers):
     min_power_index = np.argmin(powers)
     angle_min_power = aoas[min_power_index]
-    print('Angle of min power: ', angle_min_power)
     return angle_min_power
 
 
