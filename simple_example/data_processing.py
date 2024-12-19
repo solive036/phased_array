@@ -28,29 +28,6 @@ def polar_plot(angles_of_arrival, powers):
     plt.show()
 
 """
-Supposedly faster polar plot
-def polar_plot(angles_of_arrival, powers):
-    fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
-    
-    # Convert angles to radians
-    angles_rad = np.deg2rad(angles_of_arrival)
-
-    # Create the initial plot
-    line, = ax.plot(angles_rad, powers, animated=True)
-    
-    # Set the radial ticks and limits
-    ax.set_rticks([-40, -30, -20, -10, 0])  
-    ax.set_thetamin(np.min(angles_rad)) 
-    ax.set_thetamax(np.max(angles_rad))
-    ax.set_theta_direction(-1) 
-    ax.set_theta_zero_location('N') 
-    ax.grid(True)
-
-    # Enable blitting
-    plt.show()
-"""
-
-"""
 process data
 """ 
 #returns where the peak power occurs, in degrees
