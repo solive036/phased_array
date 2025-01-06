@@ -102,12 +102,17 @@ class SDRWorker(QObject):
     def run(self):
         samples = phaser.sdr.rx()
         samples = samples[0] + samples[1]
+        window = np.blackman(len(samples))
+        samples = samples * window
         psd = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(samples)))**2)
+        freq_axis = np.linspace(-sample_rate/2, sample_rate/2, len(psd))
+        
+        #spectrogram
         self.spectrogram = np.roll(self.spectrogram, 1, axis=1)
         self.spectrogram[:, 0] = psd
         self.spectrogram_update.emit(self.spectrogram)
         self.end_of_run.emit()
-        #save samples to file
+        
         
 
 class MainWindow(QMainWindow):
@@ -129,7 +134,7 @@ class MainWindow(QMainWindow):
         colorbar = pg.HistogramLUTWidget()
         colorbar.setImageItem(self.imageitem)
         colorbar.item.gradient.loadPreset('viridis')
-        self.imageitem.setLevels((-30, 20))
+        self.imageitem.setLevels((-30, 30))
         self.spectrogram_widget.setLayout(layout)
 
         main_widget = QWidget(self)
@@ -144,10 +149,6 @@ class MainWindow(QMainWindow):
 
     def spectrogram_callback(self, spectrogram_data):
         self.imageitem.setImage(spectrogram_data, autoLevels=True)
-        sigma = np.std(spectrogram_data)
-        mean = np.mean(spectrogram_data)
-        self.spectrogram_min = mean - 2 * sigma
-        self.spectrogram_max = mean + 2 * sigma
 
     def end_of_run_callback(self):
         QTimer.singleShot(0, self.worker.run)

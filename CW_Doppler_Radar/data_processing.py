@@ -61,7 +61,7 @@ def get_freq_max_power(psd, freq_axis):
     return frequency_of_occurance
 
 def compute_beat_freq(freq_max_power, f0):
-    return np.abs(freq_max_power - f0)
+    return np.round(np.abs(freq_max_power - f0))
 
 def compute_velocity(f_beat, f0):
     c = 3e8
