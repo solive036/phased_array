@@ -5,6 +5,7 @@ import numpy as np
 import data_processing as dp
 import adi
 import sys
+import csv
 
 spectrogram_width = 75
 file_name = 'data.npy'
@@ -90,6 +91,7 @@ t = sampling_period*np.arange(fft_size)
 #transmit data
 sdr._ctx.set_timeout(0)
 beat_freq_prev = 0
+file = 'data.csv'
 
 class SDRWorker(QObject):
     spectrogram_update = pyqtSignal(np.ndarray)
@@ -106,6 +108,11 @@ class SDRWorker(QObject):
         samples = samples * window
         psd = 10*np.log10(np.abs(np.fft.fftshift(np.fft.fft(samples)))**2)
         freq_axis = np.linspace(-sample_rate/2, sample_rate/2, len(psd))
+
+        #save data to csv file
+        with open(file, 'a', newline='') as fl:
+            writer = csv.writer(fl)
+            writer.writerow(samples)
         
         #spectrogram
         self.spectrogram = np.roll(self.spectrogram, 1, axis=1)
