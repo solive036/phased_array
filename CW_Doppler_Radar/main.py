@@ -46,7 +46,7 @@ except:
 
 #sdr settings
 sample_rate = 0.6e6
-center_freq = 2.1e9
+center_freq = 4.2e9 #center_freq = 2.1e9
 signal_freq = 100e3
 fft_size = 1024 * 64
 
@@ -81,7 +81,6 @@ i = np.cos(2 * np.pi * t * fc) * 2 ** 14
 q = np.sin(2 * np.pi * t * fc) * 2 ** 14
 iq = 1 * (i + 1j * q)
 
-fft_size = 1024 * 64
 freq = np.linspace(-fs / 2, fs / 2, int(fft_size))
 
 sampling_period = 1/sdr.sample_rate
