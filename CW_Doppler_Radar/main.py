@@ -8,8 +8,6 @@ import sys
 import csv
 
 spectrogram_width = 75
-file_name = 'data.npy'
-fopen = ('data.npy', 'ab')
 
 #Initialize SDR and Phaser
 try:
