@@ -138,8 +138,21 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(psd_plot)
         psd_widget.setLayout(main_layout)
 
-        def end_of_run_callback():
+        def end_of_run_callback(self):
             QTimer.singleShot(0, self.worker.run)
 
-        def psd_callback(freq_axis, )
+        def psd_callback(self, freq_axis, samples):
+            psd_curve.setData(freq_axis, samples)
 
+        self.worker.psd_update.conncect(psd_callback)
+        self.worker.end_of_run.connect(end_of_run_callback)
+        self.sdr_thread.started.connect(self.worker.run)
+        self.sdr_thread.start()
+
+
+if __name__ == '__main__':
+    print('Starting GUI')
+    app = QApplication([])
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec())
