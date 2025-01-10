@@ -88,7 +88,7 @@ t = sampling_period*np.arange(fft_size)
 #transmit data
 sdr._ctx.set_timeout(0)
 beat_freq_prev = 0
-file = 'data.csv'
+file = 'data.csv' 
 
 class SDRWorker(QObject):
     spectrogram_update = pyqtSignal(np.ndarray)
